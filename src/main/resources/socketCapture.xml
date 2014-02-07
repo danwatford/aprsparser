@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util"
+  xsi:schemaLocation="
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+  <bean id="dataSource"
+    class="com.foomoo.aprs.aprsparser.datasource.SocketAPRSDataSource">
+    <property name="socket">
+      <bean class="java.net.Socket">
+        <constructor-arg value="uk.aprs2.net" />
+        <constructor-arg value="10152" />
+      </bean>
+    </property>
+    <property name="user" value="GUEST" />
+    <property name="password" value="-1" />
+  </bean>
+  
+  
+  <bean id="dataSourceCapture"
+    class="com.foomoo.aprs.aprsparser.datasource.DataSourceCapture">
+    <property name="APRSDataSource" ref="dataSource" />
+    <property name="outputFile">
+      <bean class="java.io.File">
+        <constructor-arg value="DataSourceCapture.txt" />
+      </bean>
+    </property>
+  </bean>
+</beans>

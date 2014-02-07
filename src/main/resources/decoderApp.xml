@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+  xmlns:context="http://www.springframework.org/schema/context"
+  xmlns:util="http://www.springframework.org/schema/util"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd">
+
+  <bean id="locationWriter" class="com.foomoo.aprs.aprsparser.demo.LocationWriter">
+    <property name="APRSItemSource" ref="aprsItemSource" />
+    <property name="outputStream">
+      <util:constant static-field="java.lang.System.out" />
+    </property>
+  </bean>
+
+  <bean id="callsignWriter" class="com.foomoo.aprs.aprsparser.demo.UniqueCallsignWriter">
+    <property name="APRSItemSource" ref="aprsItemSource" />
+    <property name="outputStream">
+      <bean class="java.io.FileOutputStream">
+        <constructor-arg value="CallsignFile.txt" />
+      </bean>
+    </property>
+  </bean>
+
+  <bean id="aprsItemSource" class="com.foomoo.aprs.aprsparser.item.APRSItemSource">
+    <property name="APRSDataSource">
+      <ref bean="dataSource" />
+    </property>
+    <property name="APRSDecoder">
+      <bean class="com.foomoo.aprs.aprsparser.parser.BasicAPRSParser" />
+    </property>
+  </bean>
+
+  <bean id="decoderLogger" class="com.foomoo.aprs.aprsparser.logging.DecoderLogger" />
+
+  <aop:config>
+    <aop:aspect id="decoderLoggerAspect" ref="decoderLogger">
+      <aop:after-throwing method="logDecodeUnsupported"
+        throwing="ex"
+        pointcut="execution(* com.foomoo.aprs.aprsparser.parser.IAPRSParser.parse(String))" />
+      <aop:after-throwing method="logDecodeUnknown"
+        throwing="ex"
+        pointcut="execution(* com.foomoo.aprs.aprsparser.parser.IAPRSParser.parse(String))" />
+    </aop:aspect>
+  </aop:config>
+
+</beans>
